@@ -1,6 +1,7 @@
 import pymongo
 from pymongo import *
 import datetime
+from datetime import *
 
 import time
 # from time import *
@@ -15,6 +16,12 @@ r =2018
 t= 7
 y=2
 
+d = date.today()
+dt = datetime.combine(d, datetime.min.time())
+incount  = db.collection.find({"status":"IN", "datetime":{"$lt":dt}},{"bus_no":1,"_id":0}).count()
+outcount = db.collection.find({"status":"OUT", "datetime":{"$lt":dt}},{"bus_no":1,"_id":0}).count()
+print (incount)
+print(outcount)
 # bus_wise_find = db.collection.find({"datetime":datetime.datetime(r, t, y)},{"_id":0, "bus_no":1,"datetime":1,"status":1}).sort("datetime", pymongo.ASCENDING).limit(20)
 # req = {b_num:{"IN":[],"OUT":[]}}
 # try:
@@ -34,7 +41,7 @@ y=2
 
 # except Exception as e:
 # 	print(e)
-req={"IN":{},"OUT":{}}
+# req={"IN":{},"OUT":{}}
 
 # day_wise_find = db.collection.find({"datetime":{"$gte":datetime.datetime(r, t, y)}},{"_id":0,})
 # for val in day_wise_find:
@@ -44,7 +51,7 @@ req={"IN":{},"OUT":{}}
 
 # 	elif val['status'] == "OUT":
 # 		req["OUT"].update({val['bus_no']:val['datetime']})
-print(req)
+# print(req)
 
 
 
