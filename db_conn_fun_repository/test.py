@@ -29,21 +29,21 @@ y=2
 # 		elif val['status'] == "OUT":
 # 			req[b_num]["OUT"].append(val['datetime'])
 			
-# 			# req["OUT"].update({val['bus_no']:val['datetime']})
+# 			#req["OUT"].update({val['bus_no']:val['datetime']})
 
 
 # except Exception as e:
 # 	print(e)
 req={"IN":{},"OUT":{}}
 
-day_wise_find = db.collection.find({"datetime":{"$gte":datetime.datetime(r, t, y)}},{"_id":0,})
-for val in day_wise_find:
-	print(val)
-	if val["status"] == "IN":
-		req["IN"].update({val['bus_no']:val['datetime']})
+# day_wise_find = db.collection.find({"datetime":{"$gte":datetime.datetime(r, t, y)}},{"_id":0,})
+# for val in day_wise_find:
+# 	print(val)
+# 	if val["status"] == "IN":
+# 		req["IN"].update({val['bus_no']:val['datetime']})
 
-	elif val['status'] == "OUT":
-		req["OUT"].update({val['bus_no']:val['datetime']})
+# 	elif val['status'] == "OUT":
+# 		req["OUT"].update({val['bus_no']:val['datetime']})
 print(req)
 
 

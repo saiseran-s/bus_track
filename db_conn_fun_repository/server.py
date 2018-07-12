@@ -36,7 +36,7 @@ received message format : message = {
 				pubMessage = {"sender":"server","type":"resp","subType":"busCount","Message":{"inCount":incount,"outCount":outcount}}
 				mqttClient.publish(PUB_TOPIC,pubMessage)
 
-			else if (message["subType"] == "dayWiseStats"):
+			elif (message["subType"] == "dayWiseStats"):
 				'''
 					assuming date received is a string
 					format of received string is : "YYYY-MM-DD"
@@ -50,6 +50,7 @@ received message format : message = {
 					D=(intdate[1][0])
 					day_wise_find = db.collection.find({"datetime":datetime.datetime(Y, M, D)},{"_id":0})
 				'''
+				req={"IN":{},"OUT":{}}
 				day_wise_find = db.collection.find({"datetime":<date>},{"_id":0,})
 				for val in day_wise_find:
 					if val["status"] == "IN":
@@ -60,6 +61,25 @@ received message format : message = {
 				pubMessage = {"sender":"server","type":"resp","subType":"dayWiseStats","Message":req}
 				mqttClient.publish(PUB_TOPIC,pubMessage)
 
+
+
+			elif (message['subType'] == "busWiseStats"):
+				'''
+					assuming bus number received is a integer
+					format of received string is : "YYYY-MM-DD"
+					now convert this string to integers
+				'''
+				find_status = db.collection.find({"bus_no":b_num},{"_id":0}).sort("datetime", pymongo.DESCENDING).limit(20)
+				for val in find_status:
+					
+					if val["status"] == "IN":
+						req[b_num]["IN"].append(val['datetime'])	
+
+						
+					elif val['status'] == "OUT":
+						req[b_num]["OUT"].append(val['datetime'])
+						
+						
 
 
 	
