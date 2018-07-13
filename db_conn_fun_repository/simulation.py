@@ -59,7 +59,7 @@ if __name__ == '__main__':
 		# time.sleep(5)
 		print(message)
 	elif r == 4:
-		message = {"sender":"device","type":"req","subtype":"busEntry","Message":{"card_no":4612}}
+		message = {"sender":"device","type":"req","subtype":"busEntry","Message":{"card_no":1265}}
 		message = json.dumps(message)
 		mqttClient.publish(PUB_TOPIC, message)
 		time.sleep(5)
