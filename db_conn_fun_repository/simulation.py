@@ -30,8 +30,8 @@ if __name__ == '__main__':
 	hostname  = 'localhost'
 	port      = 1883
 	timealive = 60
-	SUB_TOPIC = "bT-card-resp"
-	PUB_TOPIC = "bT_card_req"
+	PUB_TOPIC = "bT-Server"
+	SUB_TOPIC = "bT-App"
 
 	mqttInit()
 
@@ -40,27 +40,27 @@ if __name__ == '__main__':
 	r = int(input("1. Count stats\n2. Day wise stats\n3. Bus Wise stats\n4. Enter bus number\n"))
 
 	if r == 1:
-		message = {"sender":"app","type":"req","subType":"busCount"}
+		message = {"sender":"app","type":"req","subtype":"busCount"}
 		message = json.dumps(message)
 		mqttClient.publish(PUB_TOPIC, message)
-		# time.sleep(5)
+		time.sleep(5)
 		print(message)
 
 	elif r == 2:
-		message = {"sender":"app","type":"req","subType":"dayWiseStats","Date":"2018-07-12"}
+		message = {"sender":"app","type":"req","subtype":"dayWiseStats","Date":"2018-07-12"}
 		message = json.dumps(message)
 		mqttClient.publish(PUB_TOPIC, message)
 		# time.sleep(5)
 		print(message)
 	elif r == 3:
-		message = {"sender":"app","type":"req","subType":"busWiseStats","bus_number":108}
+		message = {"sender":"app","type":"req","subtype":"busWiseStats","bus_number":108}
 		message = json.dumps(message)
 		mqttClient.publish(PUB_TOPIC, message)
 		# time.sleep(5)
 		print(message)
 	elif r == 4:
-		message = {"sender":"device","type":"req","subType":"busEntry","card_no":4612}
+		message = {"sender":"device","type":"req","subtype":"busEntry","Message":{"card_no":4612}}
 		message = json.dumps(message)
 		mqttClient.publish(PUB_TOPIC, message)
-		# time.sleep(5)
+		time.sleep(5)
 		print(message)

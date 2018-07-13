@@ -114,7 +114,8 @@ def on_message(client, userdata, msg):
 					if val["status"] == "IN": #set status to "OUT" and insert
 						d = db.collection.insert_one({"bus_No":c_num,"status":"OUT","datetime":datetime.datetime.now()}).inserted_id
 						#DO DB INSERTION
-					elif status =="OUT": #set status to "IN" and insert
+						d=db.col2.find_one_and_update({"bus_no":b_num,"status":"OUT","datetime": {'$gte':datetime.datetime.now()}},{ '$set': {"status":"OUT", "datetime":datetime.datetime.now() }})
+					elif val["status"] =="OUT": #set status to "IN" and insert
 						d = db.collection.insert_one({"bus_No":c_num,"status":"IN","datetime":datetime.datetime.now()}).inserted_id
 						# do DB INSERTION 
 # '''

@@ -1,9 +1,12 @@
 import pymongo
 from pymongo import *
 import datetime
+# from datetime import *
+
+from datetime import datetime
 from datetime import *
 
-import time
+# import time
 # from time import *
 
 
@@ -14,14 +17,17 @@ collection=db.collection
 b_num =108
 r =2018
 t= 7
-y=2
+y=13
 
-d = date.today()
-dt = datetime.combine(d, datetime.min.time())
-incount  = db.collection.find({"status":"IN", "datetime":{"$lt":dt}},{"bus_no":1,"_id":0}).count()
-outcount = db.collection.find({"status":"OUT", "datetime":{"$lt":dt}},{"bus_no":1,"_id":0}).count()
-print (incount)
-print(outcount)
+d = datetime(2018, 11, 12)
+print(d)
+# dt = datetime.combine(d, datetime.min.time())
+# print(dt)
+# incount  = db.collection.find({"status":"IN", "datetime":{"$lt":dt}},{"bus_no":1,"_id":0}).distinct("bus_no")
+
+# outcount = db.collection.find({"status":"OUT", "datetime":{"$lt":dt}},{"bus_no":1,"_id":0}).distinct("bus_no")
+# print (incount)
+# print(outcount)
 # bus_wise_find = db.collection.find({"datetime":datetime.datetime(r, t, y)},{"_id":0, "bus_no":1,"datetime":1,"status":1}).sort("datetime", pymongo.ASCENDING).limit(20)
 # req = {b_num:{"IN":[],"OUT":[]}}
 # try:
@@ -63,6 +69,22 @@ print(outcount)
 # 	else:
 # 		time.sleep(30)
 # 		l="OUT"
-# 	d=db.collection.insert_one({"bus_no":b_num,"status":l,"datetime":datetime.datetime.now()})
-# 	time.sleep(60)
-	
+# t = datetime.datetime.now()
+# print(t)
+# reddy = db.col2.find({"bus_no":b_num, "datetime":{"$gt":datetime.datetime(r, t, y )}}).count()
+
+# # for r in reddy:
+# print(reddy)
+# if reddy == 0:
+# 	saireddy = db.col2.insert_one({"bus_no":b_num,"status":	"OUT","datetime":datetime.datetime.now()}).inserted_id
+# 	print(saireddy)
+# 	for val in saireddy:
+# 		print(val)
+
+# elif reddy >= 1:
+# 	saireddy = db.col2.find_one_and_update({"bus_no":b_num,"status":"OUT","datetime":{"$gt":datetime.datetime(r, t, y)}},{"$set":{"status":"IN", "datetime":datetime.datetime.now()}}, upsert=True)
+
+# 	print(saireddy)
+# d=db.col2.find_one_and_update({"bus_no":b_num,"status":"IN","datetime": {'$gte':datetime.datetime(r, t, y, 11, 24)}},{ '$set': {"status":"OUT", "datetime":datetime.datetime.now() }}, upsert=True)
+# for f in d:
+# 	print(f)
