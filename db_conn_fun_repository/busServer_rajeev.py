@@ -2,7 +2,8 @@ import paho.mqtt.client as mqtt
 import ast
 import time
 import datetime
-from datetime import timedelta 
+from datetime import timedelta
+from datetime import datetime 
 
 import pymongo
 from pymongo import MongoClient
@@ -57,10 +58,10 @@ def on_message(client, userdata, msg):
 						# Looping through the DB till we find the last update for a particular BUS 
 						while(find_count==0):
 							dateWithMinTime = justDate.replace(hour=0, minute=0, second=0, microsecond=0) 
-					
-							find_status = db.collection.find({"bus_no":vehicle_number "datetime":{'$in':dateWithMinTime}},{"_id":0,"status":1}).sort([("datetime", pymongo.DESCENDING)]).limit(1)#check status of the bus i.e, IN or OUT
+
+							find_status = db.collection.find({"bus_no":vehicle_number,"datetime":{'$in':dateWithMinTime}},{"_id":0,"status":1}).sort([("datetime", pymongo.DESCENDING)]).limit(1)
 							find_count = find_status.count()
-							
+					
 							print(find_count)
 
 							justDate = date.today() - timedelta(days=1)
@@ -74,37 +75,37 @@ def on_message(client, userdata, msg):
 							if val["status"] == "IN":
 								
 								# Usual Bus Entry/Exit Insert the Collection 1
-								d = db.collection.insert_one({"bus_no":vehicle_number"status":"OUT","datetime":datetime.now()})
+								d = db.collection.insert_one({"bus_no":vehicle_number,"status":"OUT","datetime":datetime.now()})
 								print("in in",d)
 
 								justDate = date.today()
 								dateWithMinTime = justDate.replace(hour=0, minute=0, second=0, microsecond=0) 
 						
-								col2_cnt = db.col2.find({"bus_no":vehicle_number "datetime":{"$in":dateWithMinTime}}).count()
+								col2_cnt = db.col2.find({"bus_no":vehicle_number,"datetime":{"$in":dateWithMinTime}}).count()
 								
 								# Bus Entry/Exit Status update for the collection 2
 								if (int(col2_cnt) == 0):
-									new_entry = db.col2.insert_one({"bus_no":vehicle_number"status":"OUT","datetime":datetime.now()}).inserted_id
+									new_entry = db.col2.insert_one({"bus_no":vehicle_number,"status":"OUT","datetime":datetime.now()}).inserted_id
 									
 									print("inserted :",new_entry)
 
 								elif (int(col2_cnt) >=1):
 									try:	
-										re_update = db.col2.find_one_and_update({"bus_no":vehicle_number"status":"IN","datetime":{"$in":dateWithMinTime}},{"$set":{"status":"OUT", "datetime":datetime.now()}}, upsert=True).inserted_id	
+										re_update = db.col2.find_one_and_update({"bus_no":vehicle_number,"status":"IN","datetime":{"$in":dateWithMinTime}},{"$set":{"status":"OUT", "datetime":datetime.now()}}, upsert=True).inserted_id	
 									except Exception as e:
 										print (e,"ok_7 after error")	
 										print("updated :",re_update)
 							
 							elif val["status"] =="OUT": #set status to "IN" and insert
-								d = db.collection.insert_one({"bus_no":vehicle_number"status":"IN","datetime":datetime.now()}).inserted_id
+								d = db.collection.insert_one({"bus_no":vehicle_number,"status":"IN","datetime":datetime.now()}).inserted_id
 								print("in out",d)
-								col2_cnt = db.col2.find({"bus_no":vehicle_number "datetime":{"$gt":datetime(r, t, y, 0, 0)}}).count()
+								col2_cnt = db.col2.find({"bus_no":vehicle_number ,"datetime":{"$gt":datetime(r, t, y, 0, 0)}}).count()
 								print(col2_cnt)
 								if (int(col2_cnt) == 0):
-									new_entry = db.col2.insert_one({"bus_no":vehicle_number"status":"IN","datetime":datetime.now()}).inserted_id
+									new_entry = db.col2.insert_one({"bus_no":vehicle_number,"status":"IN","datetime":datetime.now()}).inserted_id
 									print("inserted :",new_entry)
 								elif (int(col2_cnt) >=1):
-									re_update = db.col2.find_one_and_update({"bus_no":vehicle_number"status":"OUT","datetime":{"$gt":datetime(r, t, y)}},{"$set":{"status":"IN", "datetime":datetime.now()}}, upsert=True).inserted_id
+									re_update = db.col2.find_one_and_update({"bus_no":vehicle_number,"status":"OUT","datetime":{"$gt":datetime(r, t, y)}},{"$set":{"status":"IN", "datetime":datetime.now()}}, upsert=True).inserted_id
 									print("updated :",re_update)
 
 
