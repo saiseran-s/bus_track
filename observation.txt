@@ -1,0 +1,15 @@
+#no datetime.date instance in mongodb
+
+
+
+form 2 different collections:
+1. For whole data (inserted for every entry)
+2. For Today's data (updates data for every entry)
+
+a single insert should be on todays date for insertion in both collection and clo2
+
+
+
+col2 properties:
+1. BUS present status
+2. BUS count
