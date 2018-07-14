@@ -35,13 +35,52 @@ def on_message(client, userdata, msg):
 					#  do mongodb count get operation
 					d = date.today()
 					dt = datetime.combine(d, datetime.min.time())
-					incount  = db.col2.find({"status":"IN", "datetime":{"$gt":dt}},{"bus_no":1,"_id":0}).count()
-					outcount = db.col2.find({"status":"OUT", "datetime":{"$gt":dt}},{"bus_no":1,"_id":0}).count()
+					# incount  = db.col2.find({"status":"IN", "datetime":{"$gt":dt}},{"bus_no":1,"_id":0}).count()
+					# outcount = db.col2.find({"status":"OUT", "datetime":{"$gt":dt}},{"bus_no":1,"_id":0}).count()
+					incount  = db.col2.find({"status":"IN"},{"bus_no":1,"_id":0}).count()
+					outcount = db.col2.find({"status":"OUT"},{"bus_no":1,"_id":0}).count()
 
 					pubMessage = {"sender":"server","type":"resp","subtype":"busCount","Message":{"inCount":incount,"outCount":outcount}}
 					pubMessage = json.dumps(pubMessage)
 					mqttClient.publish(PUB_TOPIC,pubMessage)
 					L.sleep(5)
+				elif (message["subtype"] == "dayWiseStats"):
+
+				# '''
+				# 	assuming date received is a string
+				# 	format of received string is : "YYYY-MM-DD"
+				# 	now convert this string to integers
+				# '''
+				# '''
+				# 	s = "YYYY-MM-DD"
+				# 	date = (int, s.split('-'))
+				# 	Y=int(date[1][0])
+				# 	M=int(date[1][1])
+				# 	D=(intdate[1][2])
+				# 	day_wise_find = db.collection.find({"datetime":datetime.datetime(Y, M, D)},{"_id":0})
+				# '''
+					s=message['Message']["pickDate"]
+					da = (int, s.split('.'))
+					D=int(da[1][0])
+					M=int(da[1][1])
+					Y=int(da[1][2])
+					print("year",Y,"month", M,"say", D)
+
+
+					day_wise_find = db.collection.find({"datetime":{"$gte":datetime(Y, M, D)}},{"_id":0,})
+					req = {}
+					for v in day_wise_find:
+						req.update({v["bus_no"]:[]})
+					day_wise_find = db.collection.find({"datetime":{"$gte":datetime(Y, M, D)}},{"_id":0,})
+
+					for val in day_wise_find:
+						print("hi")
+						req[val["bus_no"]].append([val["status"],str(val["datetime"])])
+
+
+					pubMessage = {"sender":"server","type":"resp","subtype":"dayWiseStats","Message":req}
+					pubMessage = json.dumps(pubMessage)
+					mqttClient.publish(PUB_TOPIC,pubMessage)	
 		elif (message['sender'] == 'device'):
 			print("ok_1")
 			if (message['type'] == 'req'):
@@ -58,46 +97,52 @@ def on_message(client, userdata, msg):
 						c_num = bus_dic[message["Message"]["card_no"]]#GIVES A INTEGER VALUE FROM THE DICTIONARY
 						print("ok_5",c_num)
 						while(find_count==0):
+							print(y)
 							find_status = db.collection.find({"bus_no":c_num, "datetime":{'$gt':datetime(r, t, y, 0, 0)}},{"_id":0,"status":1}).sort([("datetime", pymongo.DESCENDING)]).limit(1)#check status of the bus i.e, IN or OUT
+							for val in find_status:
+								print(val)
 							find_count = find_status.count()
 							print(find_count)
 							y-= 1
+							print(y)
 							print("ok_6")
 							print(find_status)
 							for val in find_status:
 								print(val)
-								pass
-							print("ok_7")
-							if val["status"] == "IN":
 								
-								d = db.collection.insert_one({"bus_no":c_num,"status":"OUT","datetime":datetime.now()})
-								print("in in",d)
+							print("ok_7")
 
-								col2_cnt = db.col2.find({"bus_no":c_num, "datetime":{"$gt":datetime(r, t, y, 0, 0)}}).count()
-								print(int(col2_cnt))
-								if (int(col2_cnt) == 0):
-									new_entry = db.col2.insert_one({"bus_no":c_num,"status":"OUT","datetime":datetime.now()}).inserted_id
-									
-									print("inserted :",new_entry)
-
-								elif (int(col2_cnt) >=1):
-									try:	
-										re_update = db.col2.find_one_and_update({"bus_no":c_num,"status":"IN","datetime":{"$gt":datetime(r, t, y)}},{"$set":{"status":"OUT", "datetime":datetime.now()}}, upsert=True).inserted_id	
-									except Exception as e:
-										print (e,"ok_7 after error")	
-										print("updated :",re_update)
+							#condition for if count  = 0 should be written
+						if val["status"] == "IN":
 							
-							elif val["status"] =="OUT": #set status to "IN" and insert
-								d = db.collection.insert_one({"bus_no":c_num,"status":"IN","datetime":datetime.now()}).inserted_id
-								print("in out",d)
-								col2_cnt = db.col2.find({"bus_no":c_num, "datetime":{"$gt":datetime(r, t, y, 0, 0)}}).count()
-								print(col2_cnt)
-								if (int(col2_cnt) == 0):
-									new_entry = db.col2.insert_one({"bus_no":c_num,"status":"IN","datetime":datetime.now()}).inserted_id
-									print("inserted :",new_entry)
-								elif (int(col2_cnt) >=1):
-									re_update = db.col2.find_one_and_update({"bus_no":c_num,"status":"OUT","datetime":{"$gt":datetime(r, t, y)}},{"$set":{"status":"IN", "datetime":datetime.now()}}, upsert=True).inserted_id
+							d = db.collection.insert_one({"bus_no":c_num,"status":"OUT","datetime":datetime.now()})
+							print("in in",d)
+
+							col2_cnt = db.col2.find({"bus_no":c_num, "datetime":{"$gt":datetime(r, t, y, 0, 0)}}).count()
+							print(int(col2_cnt))
+							if (int(col2_cnt) == 0):
+								new_entry = db.col2.insert_one({"bus_no":c_num,"status":"OUT","datetime":datetime.now()}).inserted_id
+								
+								print("inserted :",new_entry)
+
+							elif (int(col2_cnt) >=1):
+								try:	
+									re_update = db.col2.find_one_and_update({"bus_no":c_num,"status":"IN","datetime":{"$gt":datetime(r, t, y)}},{"$set":{"status":"OUT", "datetime":datetime.now()}}, upsert=True).inserted_id	
+								except Exception as e:
+									print (e,"ok_7 after error")	
 									print("updated :",re_update)
+						
+						elif val["status"] =="OUT": #set status to "IN" and insert
+							d = db.collection.insert_one({"bus_no":c_num,"status":"IN","datetime":datetime.now()}).inserted_id
+							print("in out",d)
+							col2_cnt = db.col2.find({"bus_no":c_num, "datetime":{"$gt":datetime(r, t, y, 0, 0)}}).count()
+							print(col2_cnt)
+							if (int(col2_cnt) == 0):
+								new_entry = db.col2.insert_one({"bus_no":c_num,"status":"IN","datetime":datetime.now()}).inserted_id
+								print("inserted :",new_entry)
+							elif (int(col2_cnt) >=1):
+								re_update = db.col2.find_one_and_update({"bus_no":c_num,"status":"OUT","datetime":{"$gt":datetime(r, t, y)}},{"$set":{"status":"IN", "datetime":datetime.now()}}, upsert=True).inserted_id
+								print("updated :",re_update)
 
 
 	except Exception as e:
@@ -124,7 +169,7 @@ def mqttInit():
 	mqttClient.loop_forever()
 
 if __name__ == '__main__':
-	hostname  = 'localhost'
+	hostname  = '192.168.99.236'
 	port      = 1883
 	timealive = 60
 	

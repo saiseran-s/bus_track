@@ -19,8 +19,40 @@ r =2018
 t= 7
 y=13
 
-d = datetime(2018, 11, 12)
-print(d)
+d = datetime(2018, 7, 14)
+
+# req={b_num:[[]]}
+
+# req = {b_num:{"log":[],"OUT":[]}}
+
+day_wise_find = db.collection.find({"datetime":{"$gte":datetime(2018, 7, 14)}},{"_id":0,})
+req = {}
+for v in day_wise_find:
+	req.update({v["bus_no"]:[]})
+
+print (req)
+day_wise_find = db.collection.find({"datetime":{"$gte":datetime(2018, 7, 14)}},{"_id":0,})
+
+for val in day_wise_find:
+	
+	req[val["bus_no"]].append([val["status"],str(val["datetime"])])
+
+
+	# 
+	# if val["status"] == "IN":
+		# req["IN"].update({val['bus_no']:val['datetime']})
+	# req[b_num]["IN"].append(val['datetime'])
+	# req[val["bus_no"]].append([val["status"],val["datetime"]])
+
+print (req)
+
+	# elif val['status'] == "OUT":
+	# 	req["OUT"].update({val['bus_no']:val['datetime']})
+# pubMessage = {"sender":"server","type":"resp","subType":"dayWiseStats","Message":req}
+# pubMessage = json.dumps(pubMessage)
+# mqttClient.publish(PUB_TOPIC,pubMessage)
+
+
 # dt = datetime.combine(d, datetime.min.time())
 # print(dt)
 # incount  = db.collection.find({"status":"IN", "datetime":{"$lt":dt}},{"bus_no":1,"_id":0}).distinct("bus_no")

@@ -27,7 +27,7 @@ def mqttInit():
 	# mqttClient.loop_forever()
 
 if __name__ == '__main__':
-	hostname  = 'localhost'
+	hostname  = '192.168.99.236'
 	port      = 1883
 	timealive = 60
 	PUB_TOPIC = "bT-Server"
@@ -47,10 +47,10 @@ if __name__ == '__main__':
 		print(message)
 
 	elif r == 2:
-		message = {"sender":"app","type":"req","subtype":"dayWiseStats","Date":"2018-07-12"}
+		message = {"sender":"app","type":"req","subtype":"dayWiseStats","Message":{"pickDate":"14.07.2018"}}
 		message = json.dumps(message)
 		mqttClient.publish(PUB_TOPIC, message)
-		# time.sleep(5)
+		time.sleep(5)
 		print(message)
 	elif r == 3:
 		message = {"sender":"app","type":"req","subtype":"busWiseStats","bus_number":108}
@@ -59,7 +59,8 @@ if __name__ == '__main__':
 		# time.sleep(5)
 		print(message)
 	elif r == 4:
-		message = {"sender":"device","type":"req","subtype":"busEntry","Message":{"card_no":1265}}
+		# bus_dic = {4612:108,3452:215,1265:322,8760:223}
+		message = {"sender":"device","type":"req","subtype":"busEntry","Message":{"card_no":8760}}
 		message = json.dumps(message)
 		mqttClient.publish(PUB_TOPIC, message)
 		time.sleep(5)
