@@ -25,15 +25,12 @@ def disconnect(message):
 
 
 def callback(message, channel):
-    print(message)
-
-    message = ast.literal_eval(msg.payload.decode("utf-8") )
-	
-	print("received")
 	print(message)
 
+	message = ast.literal_eval(msg.payload.decode("utf-8") )
+	print("received")
+	print(message)
 	try:
-
 		if (message["sender"] == "app"):
 			if (message['type'] == "req"):
 				if (message["subtype"] == "busCount"):
@@ -57,12 +54,12 @@ def callback(message, channel):
 
 	
 def connect(message):
-    print("CONNECTED")
-	
-	pubnub.subscribe(channels='bT-Server', callback=callback, error=callback,
-                 connect=connect, reconnect=reconnect, disconnect=disconnect)
+	print("CONNECTED")
 
-    pubnub.publish(channel='bT-App', message='Hello from the PubNub Python SDK')
+	pubnub.subscribe(channels='bT-Server', callback=callback, error=callback,
+	connect=connect, reconnect=reconnect, disconnect=disconnect)
+
+	pubnub.publish(channel='bT-App', message='Hello from the PubNub Python SDK')
   
 
   
@@ -104,7 +101,7 @@ bus_dic = {4612:108,3452:215,1265:322,8760:223}
 	# 				mqttClient.publish(PUB_TOPIC,pubMessage)
 	# 				L.sleep(5)
 	# 	elif (message['sender'] == 'device'):
-			print("ok_1")
+			# print("ok_1")
 			if (message['type'] == 'req'):
 				print("ok_2")
 				if(message['subtype'] == "busEntry"):

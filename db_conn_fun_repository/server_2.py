@@ -11,7 +11,7 @@ import json
 
 
 #dictionary containing bus_numbers of respective card numbers
-bus_dic = {4612:108,3452:215,1265:322,8760:223}
+bus_dic = {"6a4b6f99":108,3452:215,1265:322,8760:223}
 
 def on_connect(client, userdata, flags, rc ):
 	print ("connected")
@@ -74,27 +74,72 @@ def on_message(client, userdata, msg):
 					day_wise_find = db.collection.find({"datetime":{"$gte":datetime(Y, M, D)}},{"_id":0,})
 
 					for val in day_wise_find:
-						print("hi")
+						
 						req[val["bus_no"]].append([val["status"],str(val["datetime"])])
 
 
 					pubMessage = {"sender":"server","type":"resp","subtype":"dayWiseStats","Message":req}
 					pubMessage = json.dumps(pubMessage)
-					mqttClient.publish(PUB_TOPIC,pubMessage)	
-		elif (message['sender'] == 'device'):
+					mqttClient.publish(PUB_TOPIC,pubMessage)
+
+
+
+				elif (message["subtype"] == "dayWiseStats_sorted"):
+
+				# '''
+				# 	assuming date received is a string
+				# 	format of received string is : "YYYY-MM-DD"
+				# 	now convert this string to integers
+				# '''
+				# '''
+				# 	s = "YYYY-MM-DD"
+				# 	date = (int, s.split('-'))
+				# 	Y=int(date[1][0])
+				# 	M=int(date[1][1])
+				# 	D=(intdate[1][2])
+				# 	day_wise_find = db.collection.find({"datetime":datetime.datetime(Y, M, D)},{"_id":0})
+				# '''
+					s=message['Message']["pickDate"]
+					da = (int, s.split('.'))
+					D=int(da[1][0])
+					M=int(da[1][1])
+					Y=int(da[1][2])
+					H=9
+					Min=0
+					print("year",Y,"month", M,"say", D, "Hour",H,"Min", Min)
+
+
+					day_wise_find = db.collection.find({"datetime":{"$gte":datetime(Y, M, D, H, Min)}},{"_id":0,})
+					req = {}
+					for v in day_wise_find:
+						req.update({v["bus_no"]:[]})
+					day_wise_find = db.collection.find({"datetime":{"$gte":datetime(Y, M, D, H, Min)}},{"_id":0,})
+
+					for val in day_wise_find:
+						
+						req[val["bus_no"]].append([val["status"],str(val["datetime"])])
+
+
+					pubMessage = {"sender":"server","type":"resp","subtype":"dayWiseStats","Message":req}
+					pubMessage = json.dumps(pubMessage)
+					mqttClient.publish(PUB_TOPIC,pubMessage)
+
+
+
+		elif (message['sender'] == 'Device'):
 			print("ok_1")
-			if (message['type'] == 'req'):
+			if (message['type'] == 'resp'):
 				print("ok_2")
 				if(message['subtype'] == "busEntry"):
 					print("ok_3")
-					if(message["Message"]['card_no'] in bus_dic.keys()):
+					if(message['card_no'] in bus_dic.keys()):
 						print("ok_4")
 						find_count = 0
 						a=L.localtime(L.time())#forms a time_struc l
 						r = a.tm_year
 						t = a.tm_mon
 						y = a.tm_mday
-						c_num = bus_dic[message["Message"]["card_no"]]#GIVES A INTEGER VALUE FROM THE DICTIONARY
+						c_num = bus_dic[message["card_no"]]#GIVES A INTEGER VALUE FROM THE DICTIONARY
 						print("ok_5",c_num)
 						while(find_count==0):
 							print(y)
@@ -169,7 +214,7 @@ def mqttInit():
 	mqttClient.loop_forever()
 
 if __name__ == '__main__':
-	hostname  = '192.168.99.236'
+	hostname  = '192.168.43.33'
 	port      = 1883
 	timealive = 60
 	

@@ -27,7 +27,7 @@ def mqttInit():
 	# mqttClient.loop_forever()
 
 if __name__ == '__main__':
-	hostname  = '192.168.99.236'
+	hostname  = '192.168.43'
 	port      = 1883
 	timealive = 60
 	PUB_TOPIC = "bT-Server"
